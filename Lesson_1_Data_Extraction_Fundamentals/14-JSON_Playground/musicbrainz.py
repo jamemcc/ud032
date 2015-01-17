@@ -1,6 +1,4 @@
-# To experiment with this code freely you will have to run this code locally.
-# We have provided an example json output here for you to look at,
-# but you will not be able to run any queries through our UI.
+# Initial code provided by Udacity as part of Nanodegree study program.  Forked from https://github.com/udacity/ud032 Altered by jamey mcCabe and run locally.
 import json
 import requests
 
@@ -38,22 +36,40 @@ def pretty_print(data, indent=4):
 
 
 def main():
-    results = query_by_name(ARTIST_URL, query_type["simple"], "Nirvana")
-    pretty_print(results)
+    # Section Prompts for Artist to search on and gives list of them so you can select 1
+    artist = raw_input("What artist should we search for? ")
+    results = query_by_name(ARTIST_URL, query_type["simple"], artist)
+    print "Found %d artists:" % len(results["artists"])
+    for xref in range (0,len(results["artists"])-1):
+        if "disambiguation" in results["artists"][xref]: print "xref:%d - name:%s - Disambig:%s" % (xref, results["artists"][xref]["name"], results["artists"][xref]["disambiguation"])
+        else: print  "xref: %d - name:%s - Disambig: %s" % (xref,results["artists"][xref]["name"], "no disambiguation found")
+    artistXref = int(float(raw_input("Which of those artists should we use? or type 99 to list all artists and their begin-area(s) ")))
 
-    artist_id = results["artists"][1]["id"]
-    print "\nARTIST:"
-    pretty_print(results["artists"][1])
 
-    artist_data = query_site(ARTIST_URL, query_type["releases"], artist_id)
-    releases = artist_data["releases"]
-    print "\nONE RELEASE:"
-    pretty_print(releases[0], indent=2)
-    release_titles = [r["title"] for r in releases]
+    #section searches for any tags begin-area
+    if artistXref == 99:
+        for xref in range (0,len(results["artists"])-1):
+            artistData = results["artists"][xref]
+            if "begin-area" in artistData: 
+                print "xref: %d name: %s begin-area:" % (xref,results["artists"][xref]["name"])
+                pretty_print (artistData["begin-area"])
+            else: print  "xref: %d name: %s %s" % (xref, results["artists"][xref]["name"],"no begin-area found")
+    else:
 
-    print "\nALL TITLES:"
-    for t in release_titles:
-        print t
+        #section gives more info on one artist 
+        artist_id = results["artists"][artistXref]["id"]
+        print "\nARTIST:"
+        pretty_print(results["artists"][artistXref])
+
+        artist_data = query_site(ARTIST_URL, query_type["releases"], artist_id)
+        releases = artist_data["releases"]
+        print "\nONE RELEASE:"
+        pretty_print(releases[0], indent=2)
+        release_titles = [r["title"] for r in releases]
+
+        print "\nALL TITLES:"
+        for t in release_titles:
+            print t
 
 
 if __name__ == '__main__':
