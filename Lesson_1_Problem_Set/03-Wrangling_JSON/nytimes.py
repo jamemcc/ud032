@@ -24,8 +24,8 @@ import requests
 
 URL_MAIN = "http://api.nytimes.com/svc/"
 URL_POPULAR = URL_MAIN + "mostpopular/v2/"
-API_KEY = { "popular": "",
-            "article": ""}
+API_KEY = { "popular": "f9cb2ee4829a9382c23f94c27a07f536:2:70884862",
+            "article": "6e624e9d5f8edce643584e4ebca85d13:17:70884862"}
 
 
 def get_from_file(kind, period):
@@ -33,12 +33,32 @@ def get_from_file(kind, period):
     with open(filename, "r") as f:
         return json.loads(f.read())
 
+def pretty_print(data, indent=4):
+    if type(data) == dict:
+        print json.dumps(data, indent=indent, sort_keys=True)
+    else:
+        print data
 
 def article_overview(kind, period):
     data = get_from_file(kind, period)
     titles = []
     urls =[]
-    # YOUR CODE HERE
+    #YOUR CODE HERE #
+    print "type(data):%s" % type(data)
+    #pretty_print(data[1])
+    print "Found %d top articles:" % len(data)
+    for xrefArticle in range (0,len(data)):
+        print "xref:%d - title:%s" % (xrefArticle,  data[xrefArticle]["title"])
+        tempSectTitleDict = {}
+        tempSectTitleDict[data[xrefArticle]["section"]] = data[xrefArticle]["title"]
+        titles.append(tempSectTitleDict)
+        for xrefMedia in range (0,len(data[xrefArticle]["media"])):
+            for xrefMediaMeta in range (0,len(data[xrefArticle]["media"][xrefMedia]["media-metadata"])):
+                #pretty_print (data[xrefArticle]["media"][xrefMedia]["media-metadata"][xrefMediaMeta])
+                if data[xrefArticle]["media"][xrefMedia]["media-metadata"][xrefMediaMeta]["format"] == "Standard Thumbnail":
+                    print "    found standard URL:%s" %data[xrefArticle]["media"][xrefMedia]['media-metadata'][xrefMediaMeta]["url"]
+                    urls.append(data[xrefArticle]["media"][xrefMedia]['media-metadata'][xrefMediaMeta]["url"])
+        
 
     return (titles, urls)
 
