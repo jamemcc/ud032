@@ -19,7 +19,12 @@ def extract_carriers(page):
     with open(page, "r") as html:
         # do something here to find the necessary values
         soup = BeautifulSoup(html)
-
+        print soup.find(id="CarrierList")
+        cList =  soup.find(id="CarrierList")
+        for opt in cList.find_all("option"):
+            cCode = opt["value"]
+            if cCode[0:3] != "All": data.append(cCode)
+    print data
     return data
 
 
